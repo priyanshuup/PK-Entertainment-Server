@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({extended:false}));
 app.use(express.json())
 
 const blogsschema = new mongoose.Schema({
-    img:String,
+    title:String,
     heading:String,
     description:String,
 })
