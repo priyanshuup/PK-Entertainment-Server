@@ -3,7 +3,9 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser")
 const app = express();
 const port = process.env.PORT || 3000 ;
+const cors = require("cors")
 
+app.use(cors());
 const dbUrl = "mongodb+srv://pm:NsOFmoiNSjYsd6PW@cluster0.eplzygb.mongodb.net/BlogsandVideos?retryWrites=true&w=majority"
 
 mongoose.connect(dbUrl,{
