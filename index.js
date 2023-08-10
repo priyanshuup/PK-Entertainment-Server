@@ -11,22 +11,21 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 
-const blogsschema = new mongoose.Schema({
-  img: { type: String, unique: true }, // Set 'img' field as unique
-  heading: String,
-  description: String,
+// schema or Structure
+
+const apischema = new mongoose.Schema({
+    url:{type:String,unique:true},
+    heading:String,
+    description:String,
 })
 
-const eventsschema = new mongoose.Schema({
-  url:{ type: String, unique: true },
-  heading:String,
-  description:String,
-})
-const blogs = new mongoose.model("blogs",blogsschema)
-const events = new mongoose.model("events",eventsschema) 
+const events = new mongoose.model("events",apischema);
+const blogs = new mongoose.model("blogs",apischema);
+const rents = new mongoose.model("rents",apischema);
 
 
-// Create Product
+
+// CRUD operation for Blogs
 
 app.post("/api/v1/blogs/new",async(req,res)=>{
   try {
@@ -50,31 +49,6 @@ app.post("/api/v1/blogs/new",async(req,res)=>{
   }
 })
 
-app.post("/api/v1/events/new",async(req,res)=>{
-  try {
-  const Events = await events.create(req.body);
-    
-  if(!Events){
-    return res.status(404).json({
-      success:false,
-      message:"Data Not Added"
-    });
-  }
-  res.status(200).json({
-    success:true,
-    message:"Added Successfully",
-    Events
-  })
-  } catch (error) {
-    res.status(500).json({
-      success:false,
-      error: error.message
-    })
-  }
-})
-
-// Retrieve or Find Product
-
 app.get("/api/v1/blogs",async (req,res)=>{
 
   try {
@@ -91,6 +65,94 @@ app.get("/api/v1/blogs",async (req,res)=>{
       message:"Data Found",
       blogsfinds
     })
+  } catch (error) {
+    res.status(500).json({
+      success:false,
+      error: error.message
+    })
+  }
+})
+
+app.get("/api/v1/blogs/:id",async(req,res)=>{
+  try {
+    const blogsdatafindbyid = await blogs.findById(req.params.id)
+    
+    if(!blogsdatafindbyid){
+      return res.status(404).json({
+        success:false,
+        message:"Data Not Found"
+      })
+    }
+    res.status(200).json({
+      success:true,
+      message:"Data Found Successfully !",
+      blogsdatafindbyid
+    })
+  } catch (error) {
+    res.status(500).json({
+      success:false,
+      error:error.message
+    })
+  }
+})
+
+app.put("/api/v1/blogsupdate/:id",async(req,res)=>{
+  let blogsdataupdate = await blogs.findById(req.params.id);
+
+  blogsdataupdate = await blogs.findByIdAndUpdate(req.params.id,req.body,{
+      new:true,
+      useFindAndModify:false,
+      runValidators:true
+})
+
+res.status(200).json({
+  success:true,
+  message:"Data Updated Successfully !"
+})
+
+})
+
+app.delete("/api/v1/blogdelete/:id", async (req, res) => {
+  try {
+    const delproduct = await blogs.findByIdAndDelete(req.params.id);
+
+    if (!delproduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Data Not Found"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Deleted Successfully"
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+
+// CRUD operation for Events
+
+app.post("/api/v1/events/new",async(req,res)=>{
+  try {
+  const Events = await events.create(req.body);
+    
+  if(!Events){
+    return res.status(404).json({
+      success:false,
+      message:"Data Not Added"
+    });
+  }
+  res.status(200).json({
+    success:true,
+    message:"Added Successfully",
+    Events
+  })
   } catch (error) {
     res.status(500).json({
       success:false,
@@ -122,64 +184,55 @@ app.get("/api/v1/events",async(rrq,res)=>{
   }
 })
 
-// Update the Data
+app.get("/api/v1/events/:id",async(req,res)=>{
+  try {
+    const eventsdatabyid = await events.findById(req.params.id);
 
-app.put("/api/v1/blogsupdate/:id",async(req,res)=>{
-    let blogsdataupdate = await blogs.findById(req.params.id);
-
-    blogsdataupdate = await blogs.findByIdAndUpdate(req.params.id,req.body,{
-        new:true,
-        useFindAndModify:false,
-        runValidators:true
-})
-
-res.status(200).json({
+  if(!eventsdatabyid){
+    return res.status(404).json({
+      success:false,
+      message:"Data Not Found !"
+    })
+  }
+  res.status(200).json({
     success:true,
-    message:"Data Updated Successfully !"
-})
-
+    message:"Data Found",
+    eventsdatabyid
+  })
+  } catch (error) {
+    res.status(500).json({
+      success:false,
+      error:error.message
+    })
+  }
+  
 })
 
 app.put("/api/v1/eventsupdate/:id",async(req,res)=>{
-  let eventsdataupdate = await events.findById(req.params.id);
 
-  eventsdataupdate = await events.findByIdAndUpdate(req.params.id,req.body,{
-    new:true,
-    useFindAndModify:false,
-    runValidators:true
-  })
+  try {
+    let eventsdataupdate = await events.findById(req.params.id);
 
-  res.status(200).json({
-    success:true,
-    eventsdataupdate
-  })
+    eventsdataupdate = await events.findByIdAndUpdate(req.params.id,req.body,{
+      new:true,
+      useFindAndModify:false,
+      runValidators:true
+    })
+  
+    res.status(200).json({
+      success:true,
+      eventsdataupdate
+    })
+
+  } catch (error) {
+    res.status(500).json({
+      success:false,
+      error:error.message
+    })
+  }
+
 })
 
-// Delete the Data
-
-app.delete("/api/v1/blogdelete/:id", async (req, res) => {
-    try {
-      const delproduct = await blogs.findByIdAndDelete(req.params.id);
-  
-      if (!delproduct) {
-        return res.status(404).json({
-          success: false,
-          message: "Data Not Found"
-        });
-      }
-  
-      res.status(200).json({
-        success: true,
-        message: "Deleted Successfully"
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        error: error.message
-      });
-    }
-  });
-  
 app.delete("/api/v1/eventsdelete/:id",async(req,res)=>{
   try{
     const delevents = await events.findByIdAndDelete(req.params.id);
@@ -202,6 +255,122 @@ app.delete("/api/v1/eventsdelete/:id",async(req,res)=>{
   }
 })
 
+// CRUD operation for Rents
+
+app.post("/api/v1/rents/new",async(req,res)=>{
+
+try {
+  const Rents = await rents.create(req.body);
+  if(!Rents){
+    return res.status(404).json({
+      message:"Data not Added",
+      success:false,
+      error:error
+    })
+  }
+  res.status(200).json({
+    success:true,
+    message:"Data has been added successfully",
+    Rents
+  })
+}
+  catch(error){
+    res.status(500).json({
+      success:false,
+      error:error.message
+    })
+  }
+})
+
+app.get("/api/v1/rents",async(req,res)=>{
+  try {
+    const rentsFind = await rents.find();
+
+    if(!rentsFind){
+      return res.status(404).json({
+        success:false,
+        message:"Data Not Found"
+      })
+    }
+    res.status(200).json({
+      success:true,
+      message:"Data Found",
+      rentsFind
+    })
+  } catch (error) {
+    res.status(500).json({
+      success:false,
+      error:error.message
+    })
+  }
+})
+
+app.get("/api/v1/rents/:id",async(req,res)=>{
+  try {
+    const getbyid = await rents.findById(req.params.id)
+
+    if(!getbyid){
+      return res.status(404).json({
+        success:false,
+        message:"Data Not Found"
+      })
+    }
+    res.status(200).json({
+      success:true,
+      message:"Data Found",
+      getbyid
+    })
+  } catch (error) {
+    
+  }
+})
+
+app.put("/api/v1/rentsupdate/:id",async(req,res)=>{
+  try {
+    let rentsUpdate = await rents.findById(req.params.id)
+
+    rentsUpdate = await rents.findByIdAndUpdate(req.params.id,req.body,{
+      new:true,
+      useFindAndModify:false,
+      runValidators:true
+    })
+    res.status(200).json({
+      success:true,
+      message:"Data Updated Successfully",
+      rentsUpdate
+    })
+  } catch (error) {
+    res.status(500).json({
+      success:false,
+      error: error.message
+    })
+  }
+})
+
+app.delete("/api/v1/rentsdelete/:id",async(req,res)=>{
+  try {
+    const deleterents = await rents.findById(req.params.id);
+    if(!deleterents){
+      return res.status(404).json({
+        success:false,
+        message:"Data Not Found"
+      })
+    }
+    res.status(200).json({
+      success:true,
+      message:"Deleted Successfully !"
+  
+    })
+  } catch (error) {
+    res.status(500).json({
+      success:false,
+      error:error.message
+   })
+  }
+})
+
+
 app.listen(port,()=>{
     console.log(`Server is running ${port}`)
 })
+
