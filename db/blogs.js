@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 mongoose.set('strictQuery', false);
-// const dbUrl = "mongodb+srv://pm:NsOFmoiNSjYsd6PW@cluster0.eplzygb.mongodb.net";
-const dbUrl = "mongodb://127.0.0.1:27017"
+const dbUrl = "mongodb+srv://pm:NsOFmoiNSjYsd6PW@cluster0.eplzygb.mongodb.net";
+// const dbUrl = "mongodb://127.0.0.1:27017"
 
 const db1 = mongoose.connect(`${dbUrl}/BlogsandVideos`, {
   useNewUrlParser: true,
